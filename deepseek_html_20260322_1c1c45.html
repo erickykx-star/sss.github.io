@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>灵境名片 | 自适应H5分享页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+            background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+            min-height: 100vh;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* 主容器 — 响应式卡片 */
+        .glass-card {
+            max-width: 680px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 内边距自适应 — 手机/PC舒适区 */
+        .card-inner {
+            padding: 2rem 1.8rem;
+        }
+
+        /* 头像区 */
+        .avatar-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .avatar {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 30px -10px rgba(59,130,246,0.4);
+            transition: transform 0.25s ease;
+        }
+        .avatar span {
+            font-size: 3.8rem;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        }
+        .avatar:hover {
+            transform: scale(1.02);
+        }
+
+        /* 标题与描述 */
+        .name {
+            font-size: 1.9rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #1e293b, #2d3a4b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+        .badge {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .badge-item {
+            background: #eef2ff;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #3b82f6;
+            backdrop-filter: blur(2px);
+        }
+        .bio {
+            text-align: center;
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            padding: 0 0.5rem;
+            border-left: 3px solid #3b82f6;
+            border-right: 3px solid #a855f7;
+            background: #fafcff;
+            border-radius: 20px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0.6rem 1rem;
+        }
+
+        /* 名言区域 (动态组件) */
+        .quote-area {
+            background: #f1f5f9;
+            border-radius: 2rem;
+            padding: 1.2rem 1.2rem;
+            margin: 1.8rem 0 2rem 0;
+            text-align: center;
+            transition: all 0.2s;
+            border-left: 5px solid #3b82f6;
+            border-right: 5px solid #a855f7;
+        }
+        .quote-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #0f172a;
+            line-height: 1.45;
+            margin-bottom: 0.6rem;
+            font-style: normal;
+        }
+        .quote-author {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            letter-spacing: 0.5px;
+        }
+
+        /* 按钮网格 — 完美响应式 */
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0 1.5rem;
+            justify-content: center;
+        }
+        .action-btn {
+            flex: 1 1 160px;
+            min-width: 140px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 0.9rem 0.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: #1e293b;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            backdrop-filter: blur(2px);
+        }
+        .action-btn i {
+            font-style: normal;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        /* 按钮不同颜色 hover */
+        .action-btn.share-btn {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 8px 18px -8px #3b82f680;
+        }
+        .action-btn.copy-btn {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+            box-shadow: 0 8px 18px -8px #10b98180;
+        }
+        .action-btn.quote-btn {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+            box-shadow: 0 8px 18px -8px #f59e0b80;
+        }
+        .action-btn.contact-btn {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            color: white;
+            box-shadow: 0 8px 18px -8px #8b5cf680;
+        }
+        .action-btn:active {
+            transform: scale(0.96);
+            transition: 0.05s;
+        }
+        /* 桌面 hover 效果 */
+        @media (hover: hover) {
+            .action-btn:hover {
+                transform: translateY(-3px);
+                filter: brightness(1.02);
+                box-shadow: 0 16px 24px -10px rgba(0,0,0,0.2);
+            }
+        }
+
+        /* 页脚信息 */
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9edf2;
+            letter-spacing: 0.3px;
+        }
+        .footer-note a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1e293bdd;
+            backdrop-filter: blur(12px);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 999;
+            white-space: nowrap;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 手机窄屏优化 */
+        @media (max-width: 550px) {
+            body {
+                padding: 1rem;
+            }
+            .card-inner {
+                padding: 1.5rem 1.2rem;
+            }
+            .name {
+                font-size: 1.6rem;
+            }
+            .button-grid {
+                gap: 0.8rem;
+            }
+            .action-btn {
+                flex: 1 1 100%;
+                min-width: auto;
+                padding: 0.8rem 0.2rem;
+                font-size: 0.9rem;
+            }
+            .bio {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .quote-text {
+                font-size: 0.9rem;
+            }
+            .avatar {
+                width: 85px;
+                height: 85px;
+            }
+            .avatar span {
+                font-size: 3rem;
+            }
+        }
+
+        /* 中等屏幕优化（平板） */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .glass-card {
+                max-width: 620px;
+            }
+            .action-btn {
+                flex: 1 1 150px;
+            }
+        }
+
+        /* 大桌面更优雅 */
+        @media (min-width: 1280px) {
+            .glass-card {
+                max-width: 720px;
+            }
+            .card-inner {
+                padding: 2.5rem 2.2rem;
+            }
+            .action-btn {
+                font-size: 1rem;
+                padding: 0.9rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <div class="card-inner">
+        <!-- 头像 + 身份 -->
+        <div class="avatar-section">
+            <div class="avatar">
+                <span>🤖✨</span>
+            </div>
+        </div>
+        <div class="name">灵境·智作名片</div>
+        <div class="badge">
+            <span class="badge-item">📱 全端适配</span>
+            <span class="badge-item">⚡ AI 生成</span>
+            <span class="badge-item">🔗 一键分享</span>
+        </div>
+        <div style="text-align: center;">
+            <div class="bio">
+                🌐 手机·电脑完美响应 | 极简科技感 | 分享即互动
+            </div>
+        </div>
+
+        <!-- 动态名言区域 (每日智慧/随机励志) -->
+        <div class="quote-area" id="quoteBox">
+            <div class="quote-text" id="quoteText">✨ 创造始于灵感，而分享让灵感无限生长。</div>
+            <div class="quote-author" id="quoteAuthor">—— 灵境AI · 自适应引擎</div>
+        </div>
+
+        <!-- 四个核心操作按钮 均适配触摸和点击 -->
+        <div class="button-grid">
+            <button class="action-btn share-btn" id="shareBtn">
+                <i>📤</i> 分享页面
+            </button>
+            <button class="action-btn copy-btn" id="copyInfoBtn">
+                <i>📋</i> 复制名片信息
+            </button>
+            <button class="action-btn quote-btn" id="randomQuoteBtn">
+                <i>🎲</i> 随机智慧
+            </button>
+            <button class="action-btn contact-btn" id="contactDemoBtn">
+                <i>💬</i> 联系灵感
+            </button>
+        </div>
+
+        <div class="footer-note">
+            💡 保存本文件为 .html 发送给好友 · 任意浏览器打开即用<br>
+            ✨ 完美适配手机/电脑 | 分享现代H5的魅力
+        </div>
+    </div>
+</div>
+
+<!-- 自定义轻提示 -->
+<div id="toastMsg" class="toast-msg">✨ 操作成功</div>
+
+<script>
+    (function() {
+        // ---------- 预设名言库 (风格现代, 适配主题) ----------
+        const quotesDB = [
+            { text: "设计永不止步，响应式让内容无处不在。", author: "— 灵境响应式宣言" },
+            { text: "分享是创造者的第二语言，一键触达世界。", author: "— AI 工坊" },
+            { text: "无论是手机掌间或是桌面大屏，体验始终如一。", author: "— 弹性设计哲学" },
+            { text: "用AI编织界面，把想象力交给代码。", author: "— 智能前端" },
+            { text: "越简单，越强大；适配所有视口，才能连接所有人。", author: "— 极简主义" },
+            { text: "一次生成，随处分享，这就是现代H5的魅力。", author: "— 灵境名片" },
+            { text: "科技有温度，响应式让每一屏都温柔以待。", author: "— 用户体验至上" },
+            { text: "你手里的卡片，也是未来创造的种子。", author: "— AI 灵感引擎" }
+        ];
+
+        // 获取DOM元素
+        const quoteTextEl = document.getElementById('quoteText');
+        const quoteAuthorEl = document.getElementById('quoteAuthor');
+        const randomQuoteBtn = document.getElementById('randomQuoteBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const copyInfoBtn = document.getElementById('copyInfoBtn');
+        const contactDemoBtn = document.getElementById('contactDemoBtn');
+        const toast = document.getElementById('toastMsg');
+
+        // 显示轻提示函数 (自动消失)
+        function showToast(message, duration = 2200) {
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // 随机名言更新
+        function updateRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotesDB.length);
+            const selected = quotesDB[randomIndex];
+            quoteTextEl.textContent = selected.text;
+            quoteAuthorEl.textContent = selected.author;
+            // 给一点微妙的动画效果
+            const quoteArea = document.querySelector('.quote-area');
+            if (quoteArea) {
+                quoteArea.style.transform = 'scale(0.99)';
+                setTimeout(() => { if(quoteArea) quoteArea.style.transform = ''; }, 120);
+            }
+        }
+
+        // 复制名片核心信息 (丰富内容便于分享传播)
+        function getCardSharableText() {
+            const currentQuote = quoteTextEl.innerText;
+            const currentAuthor = quoteAuthorEl.innerText;
+            const cardName = document.querySelector('.name')?.innerText || "灵境智作名片";
+            const bioText = document.querySelector('.bio')?.innerText || "全端适配H5页面";
+            // 构造一个完整可读的分享文本
+            return `✨【${cardName}】✨\n${bioText}\n\n💡 今日智慧：${currentQuote} ${currentAuthor}\n\n—— 由AI生成，完美适配手机/电脑，点击即可分享这份创造。`;
+        }
+
+        // 复制文本兼容方法
+        async function copyToClipboard(text, successMsg = "✅ 复制成功！") {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(successMsg);
+                return true;
+            } catch (err) {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                if (success) {
+                    showToast(successMsg);
+                    return true;
+                } else {
+                    showToast("❌ 复制失败，请手动复制");
+                    return false;
+                }
+            }
+        }
+
+        // ---------- 1. 分享按钮: 优先使用 Web Share API，否则复制名片信息+页面链接 ----------
+        async function handleShare() {
+            const shareTitle = "灵境名片 | AI自适应H5页面";
+            const shareText = getCardSharableText();
+            // 获取当前页面URL（如果是在线环境或本地file，依旧尝试分享）
+            let currentUrl = window.location.href;
+            // 如果当前是 file:// 协议，分享时使用一个通用说明（因为分享链接无意义，但Web Share依然允许只分享文本）
+            const isFileProtocol = currentUrl.startsWith('file://');
+            const shareData = {
+                title: shareTitle,
+                text: shareText,
+                url: isFileProtocol ? undefined : currentUrl   // file协议下不传url避免分享异常
+            };
+            
+            // 判断浏览器是否支持Web Share API
+            if (navigator.share && !isFileProtocol) {
+                try {
+                    await navigator.share(shareData);
+                    showToast("🎉 分享成功！感谢传播");
+                    return;
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        // 用户取消分享不报错，其他错误降级复制
+                        console.warn("分享调用取消或失败", err);
+                        // 降级：复制信息
+                        await copyToClipboard(shareText + `\n🔗 当前页面链接：${currentUrl}`, "📋 已复制页面信息，可手动分享");
+                    } else {
+                        // 用户主动取消，不提示错误
+                    }
+                    return;
+                }
+            } else {
+                // 不支持原生分享，使用复制信息方案（并且附加链接）
+                const fallbackText = `${shareText}\n🔗 页面地址：${currentUrl}\n（将此HTML文件分享给他人或在服务器部署即可访问）`;
+                await copyToClipboard(fallbackText, "📋 已复制名片信息与链接，快去分享吧~");
+            }
+        }
+
+        // ---------- 2. 复制名片信息（完整智能文案）----------
+        async function handleCopyInfo() {
+            const shareText = getCardSharableText();
+            const currentUrl = window.location.href;
+            const isFile = currentUrl.startsWith('file://');
+            let finalCopy = shareText;
+            if (!isFile) {
+                finalCopy = `${shareText}\n🔗 页面链接：${currentUrl}`;
+            } else {
+                finalCopy = `${shareText}\n💡 提示：当前为本地文件，您可以直接发送此.html文件给好友！`;
+            }
+            await copyToClipboard(finalCopy, "✨ 名片信息已复制，一键分享给朋友！");
+        }
+
+        // ---------- 3. 随机智慧（更新名言）----------
+        function handleRandomQuote() {
+            updateRandomQuote();
+            showToast("✨ 灵感火花已更新", 1500);
+        }
+
+        // ---------- 4. 联系演示（展示创意联系方式）----------
+        function handleContact() {
+            // 模拟优雅的联系方式展示，符合现代卡片风格
+            const contactMsg = "📧 创意合作：inspire@lingjing.ai\n💡 欢迎通过社交平台分享本页面给更多创造者！\n📱 本项目完全响应式，任意设备完美呈现。";
+            // 使用alert 保证可靠，也可以用模态框，但alert简单明了
+            alert(contactMsg);
+            // 同时给一个toast小反馈
+            showToast("📬 联系方式已展示，期待交流", 1800);
+        }
+
+        // 绑定事件
+        if (shareBtn) shareBtn.addEventListener('click', handleShare);
+        if (copyInfoBtn) copyInfoBtn.addEventListener('click', handleCopyInfo);
+        if (randomQuoteBtn) randomQuoteBtn.addEventListener('click', handleRandomQuote);
+        if (contactDemoBtn) contactDemoBtn.addEventListener('click', handleContact);
+
+        // 页面加载时，随机显示一条不同的名言（避免固定不变）
+        function initRandomQuote() {
+            // 随机选一条，但不和默认文案完全一样，提升新鲜感
+            const defaultIndex = Math.floor(Math.random() * quotesDB.length);
+            const initQuote = quotesDB[defaultIndex];
+            if (initQuote) {
+                quoteTextEl.textContent = initQuote.text;
+                quoteAuthorEl.textContent = initQuote.author;
+            }
+        }
+        initRandomQuote();
+
+        // 额外小细节：检测触摸屏对按钮反馈更好（已经用active和hover）
+        // 自适应展示控制台友好提醒
+        console.log("✅ 灵境名片已加载 | 完美支持手机/电脑响应式，分享功能就绪");
+        
+        // 对于iOS/Android 确保touch端没有300ms延迟（现代浏览器自动处理）
+        // 增加一个样式让滚动平滑
+        document.body.style.overflowY = 'auto';
+        
+        // 如果是通过微信内置浏览器或者某些环境，复制功能依然完美
+        // 以及防止某些低版本浏览器clipboard报错，已经降级
+    })();
+</script>
+</body>
+</html>
